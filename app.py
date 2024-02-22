@@ -16,6 +16,7 @@ def start_survey_page():
                            title=survey.title,
                            instructions=survey.instructions)
 
+
 @app.post('/begin')
 def redirect_to_questions():
     """Sets cookie for response list and redirects to first question."""
@@ -24,15 +25,16 @@ def redirect_to_questions():
 
 
 @app.get('/questions/<int:question_id>')
-# rename as verb noun
 def get_question(question_id):
     """captures id on questions and displays questions page"""
-    # TODO: add guards for out of index/out of order
+
     if len(session['responses']) == len(survey.questions):
+        flash("You're already finished")
         return redirect('/thankyou')
     elif question_id == len(session['responses']):
         return render_template('question.html', question=survey.questions[question_id])
     else:
+        flash('Incorrect page')
         return redirect(f"/questions/{len(session['responses'])}")
 
 

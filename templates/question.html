@@ -2,20 +2,20 @@
 {% block content %}
 
   <h1>{{ question.prompt }}</h1>
+{% for message in get_flashed_messages() %}
+  <h3>{{message}}</h3>
 
-  <form action="/answer" method="POST">
+{% endfor %}
+<form action="/answer" method="POST">
 
-      {% for choice in question.choices %}
-      <p>
-        <input
-            type="radio"
-            name="answer"
-            value="{{ choice }}">
-        {{ choice }}
-      </p>
-      {% endfor %}
+  {% for choice in question.choices %}
+  <p>
+    <input type="radio" name="answer" value="{{ choice }}">
+    {{ choice }}
+  </p>
+  {% endfor %}
 
-    <button>Continue</button>
-  </form>
+  <button>Continue</button>
+</form>
 
 {% endblock %}
