@@ -9,9 +9,6 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
 
 
-responses = []
-
-
 @app.get('/')
 def start_survey_page():
     """Returns home page with title and instructions for survey."""
@@ -19,27 +16,43 @@ def start_survey_page():
                            title=survey.title,
                            instructions=survey.instructions)
 
+@app.post('/begin')
+def redirect_to_questions():
+    """Sets cookie for response list and redirects to first question."""
+    session['responses'] = []
+    return redirect('questions/0')
+
 
 @app.get('/questions/<int:question_id>')
-def question(question_id):
+# rename as verb noun
+def get_question(question_id):
     """captures id on questions and displays questions page"""
-    return render_template('question.html', question=survey.questions[question_id])
+    # TODO: add guards for out of index/out of order
+    if len(session['responses']) == len(survey.questions):
+        return redirect('/thankyou')
+    elif question_id == len(session['responses']):
+        return render_template('question.html', question=survey.questions[question_id])
+    else:
+        return redirect(f"/questions/{len(session['responses'])}")
 
 
 @app.post('/answer')
 def answer_page():
-    """grabbing subbmited answers and redirecting to more questions."""
+    """grabbing submitted answers and redirecting to more questions."""
 
-    answers_from_form = request.form['answer']
-    responses.append(answers_from_form)
+    answer = request.form['answer']
+    responses = session['responses']
+    responses.append(answer)
+    session['responses'] = responses
 
-    if len(responses) == len(survey.questions):
+    if len(session['responses']) == len(survey.questions):
         return redirect('/thankyou')
     else:
-        return redirect(f"/questions/{len(responses)}")
+        return redirect(f"/questions/{len(session['responses'])}")
 
 
 @app.get('/thankyou')
 def thank_you_page():
     """thank you page on completion of questions"""
-    return render_template('completion.html')
+    return render_template('completion.html',
+                           questions=survey.questions)

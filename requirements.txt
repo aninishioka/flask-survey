@@ -4,7 +4,7 @@ click==8.1.7
 decorator==5.1.1
 executing==2.0.1
 Flask==2.3.3
-Flask-DebugToolbar==0.14.1
+Flask-DebugToolbar @ git+https://github.com/pallets-eco/flask-debugtoolbar@9b63ad1837458f14597b87ad266da3d38835071f
 ipython==8.22.1
 itsdangerous==2.1.2
 jedi==0.19.1
