@@ -7,9 +7,17 @@
   <title>Flask Survey</title>
 </head>
 <body>
+  <header>
+    <h1>
+      {% block title %}
+      {% endblock %}
+    </h1>
+  </header>
 
-{% block content %}
-{% endblock %}
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
 
 </body>
 </html>

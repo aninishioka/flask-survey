@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
+
+{% block title %}
+  {{ question.prompt }}
+{% endblock %}
+
 {% block content %}
 
-  <h1>{{ question.prompt }}</h1>
 {% for message in get_flashed_messages() %}
   <h3>{{message}}</h3>
 
