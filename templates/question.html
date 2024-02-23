@@ -13,10 +13,14 @@
 
   {% for choice in question.choices %}
   <p>
-    <input type="radio" name="answer" value="{{ choice }}">
+    <input type="radio" name="choice" value="{{ choice }}">
     {{ choice }}
   </p>
   {% endfor %}
+
+  {% if question.allow_text %}
+  <input type="text" name="comment">
+  {% endif %}
 
   <button>Continue</button>
 </form>

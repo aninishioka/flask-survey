@@ -55,7 +55,10 @@ def get_question(question_id):
 def answer_page():
     """grabbing submitted answers and redirecting to more questions."""
 
-    answer = request.form['answer']
+    answer = {
+                "choice": request.form['choice'],
+                "comment": request.form.get('comment')
+            }
     responses = session[SESSION_RESPONSES_KEY]
     responses.append(answer)
     session[SESSION_RESPONSES_KEY] = responses

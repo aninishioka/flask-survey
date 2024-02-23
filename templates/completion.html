@@ -15,7 +15,8 @@ Thanks for completing this survey!
     {% for idx in range(questions|length) %}
       <li>
         <b>{{ questions[idx].prompt}} </b>
-        {{ session['responses'][idx] }}
+        {{ session['responses'][idx]['choice'] }}
+        {{ session['responses'][idx]['comment'] or '' }}
       </li>
     {% endfor %}
 
