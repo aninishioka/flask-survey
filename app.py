@@ -47,7 +47,7 @@ def get_question(question_id):
     elif question_id == len(session['responses']):
         return render_template('question.html', question=survey.questions[question_id])
     else:
-        flash('Incorrect page')
+        flash('Please answer questions in order.')
         return redirect(f"/questions/{len(session['responses'])}")
 
 

@@ -7,8 +7,7 @@
 {% block content %}
 
 {% for message in get_flashed_messages() %}
-  <h3>{{message}}</h3>
-
+  {{message}}
 {% endfor %}
 <form action="/answer" method="POST">
 

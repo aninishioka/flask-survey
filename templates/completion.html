@@ -6,6 +6,10 @@ Thanks for completing this survey!
 
 {% block content %}
 
+{% for message in get_flashed_messages() %}
+  {{message}}
+{% endfor %}
+
   <ul>
 
     {% for idx in range(questions|length) %}
