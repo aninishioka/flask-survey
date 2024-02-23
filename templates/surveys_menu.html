@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Pick a survey.
+{% endblock %}
+
+{% block content %}
+<form action="/start_survey">
+  <select name="survey_code" aria-label="Survey">
+    {% for survey_code in surveys.keys() %}
+    <option value="{{ survey_code }}">
+      {{ survey_code }}
+    </option>
+    {% endfor %}
+  </select>
+  <button>
+    Start survey!
+  </button>
+</form>
+{% endblock %}

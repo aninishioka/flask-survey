@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
-from surveys import satisfaction_survey as survey
+from surveys import surveys
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "never-tell!"
@@ -8,10 +8,22 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
 
+SESSION_RESPONSES_KEY = 'responses'
+SESSION_SURVEY_CODE_KEY = 'survey_code'
+
 
 @app.get('/')
+def get_surveys_menu():
+    """Returns dropdown menu with survey options"""
+    return render_template('surveys_menu.html', surveys=surveys)
+
+@app.get('/start_survey')
 def start_survey_page():
-    """Returns home page with title and instructions for survey."""
+    """Returns home page with title and instructions for survey.
+    Also sets cookie for survey choice."""
+
+    session[SESSION_SURVEY_CODE_KEY] = request.args['survey_code']
+    survey = surveys[request.args['survey_code']]
     return render_template('survey_start.html',
                            title=survey.title,
                            instructions=survey.instructions)
@@ -20,7 +32,7 @@ def start_survey_page():
 @app.post('/begin')
 def redirect_to_questions():
     """Sets cookie for response list and redirects to first question."""
-    session['responses'] = []
+    session[SESSION_RESPONSES_KEY] = []
     return redirect('questions/0')
 
 
@@ -28,7 +40,8 @@ def redirect_to_questions():
 def get_question(question_id):
     """captures id on questions and displays questions page"""
 
-    if len(session['responses']) == len(survey.questions):
+    survey = surveys[session[SESSION_SURVEY_CODE_KEY]]
+    if len(session[SESSION_RESPONSES_KEY]) == len(survey.questions):
         flash("You're already finished")
         return redirect('/thankyou')
     elif question_id == len(session['responses']):
@@ -43,18 +56,21 @@ def answer_page():
     """grabbing submitted answers and redirecting to more questions."""
 
     answer = request.form['answer']
-    responses = session['responses']
+    responses = session[SESSION_RESPONSES_KEY]
     responses.append(answer)
-    session['responses'] = responses
+    session[SESSION_RESPONSES_KEY] = responses
 
-    if len(session['responses']) == len(survey.questions):
+    survey = surveys[session[SESSION_SURVEY_CODE_KEY]]
+
+    if len(session[SESSION_RESPONSES_KEY]) == len(survey.questions):
         return redirect('/thankyou')
     else:
-        return redirect(f"/questions/{len(session['responses'])}")
+        return redirect(f"/questions/{len(session[SESSION_RESPONSES_KEY])}")
 
 
 @app.get('/thankyou')
 def thank_you_page():
     """thank you page on completion of questions"""
+    survey = surveys[session[SESSION_SURVEY_CODE_KEY]]
     return render_template('completion.html',
                            questions=survey.questions)
