@@ -1,5 +1,6 @@
-from flask import Flask, request, render_template, redirect, flash, session
+from flask import Flask, request, render_template, redirect, flash, session, make_response
 from flask_debugtoolbar import DebugToolbarExtension
+from datetime import timedelta
 from surveys import surveys
 
 app = Flask(__name__)
@@ -22,8 +23,13 @@ def start_survey_page():
     """Returns home page with title and instructions for survey.
     Also sets cookie for survey choice."""
 
+    if (request.cookies.get(request.args['survey_code'])):
+        flash("You already completed this survey")
+        return redirect('/thankyou')
+
     session[SESSION_SURVEY_CODE_KEY] = request.args['survey_code']
     survey = surveys[request.args['survey_code']]
+
     return render_template('survey_start.html',
                            title=survey.title,
                            instructions=survey.instructions)
@@ -53,7 +59,8 @@ def get_question(question_id):
 
 @app.post('/answer')
 def answer_page():
-    """grabbing submitted answers and redirecting to more questions."""
+    """grabbing submitted answers and redirecting to more questions.
+    if all questions answered, set cookie and redirect to thank you page."""
 
     answer = {
                 "choice": request.form['choice'],
@@ -66,7 +73,11 @@ def answer_page():
     survey = surveys[session[SESSION_SURVEY_CODE_KEY]]
 
     if len(session[SESSION_RESPONSES_KEY]) == len(survey.questions):
-        return redirect('/thankyou')
+        resp = make_response(redirect('/thankyou'))
+        resp.set_cookie(session[SESSION_SURVEY_CODE_KEY],
+                        "True",
+                        max_age=timedelta(days=400))
+        return resp
     else:
         return redirect(f"/questions/{len(session[SESSION_RESPONSES_KEY])}")
 
